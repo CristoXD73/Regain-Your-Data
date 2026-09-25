@@ -1,10 +1,14 @@
 // swift-tools-version:5.10
 import PackageDescription
 
+// InstagramKit holds the app; the InstaVault executable is a thin launcher, so the Regain Your Data hub
+// can embed the same code.
 let package = Package(
-    name: "InstaVault",
+    name: "InstagramClone",
     platforms: [.macOS(.v14)],
+    products: [.library(name: "InstagramKit", targets: ["InstagramKit"])],
     targets: [
-        .executableTarget(name: "InstaVault", path: "Sources/InstaVault")
+        .target(name: "InstagramKit", path: "Sources/InstagramKit"),
+        .executableTarget(name: "InstaVault", dependencies: ["InstagramKit"], path: "Sources/InstaVault"),
     ]
 )
