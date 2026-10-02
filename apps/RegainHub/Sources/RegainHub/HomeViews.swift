@@ -1,5 +1,6 @@
 import RegainCore
 import SwiftUI
+import TaxKit
 
 /// The hub's start page: every app with the export it has open, and the companies still to come.
 struct HomeView: View {
@@ -51,7 +52,9 @@ private struct AppCard: View {
                     Text(source.appName).font(.system(size: 17, weight: .bold))
                     Text(source.blurb).font(.system(size: 12.5)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 4)
-                    if let folder = source.savedFolder {
+                    if source == .taxes {
+                        Label(TaxesModule.summary, systemImage: "lock.doc").font(.system(size: 11)).foregroundStyle(.secondary)
+                    } else if let folder = source.savedFolder {
                         Label((folder as NSString).abbreviatingWithTildeInPath, systemImage: FileManager.default.fileExists(atPath: folder) ? "checkmark.circle.fill" : "externaldrive.badge.xmark")
                             .font(.system(size: 11)).foregroundStyle(FileManager.default.fileExists(atPath: folder) ? .green : .orange)
                             .lineLimit(1).truncationMode(.middle)

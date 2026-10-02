@@ -4,6 +4,7 @@ import PhotosKit
 import RegainCore
 import SnapchatKit
 import SwiftUI
+import TaxKit
 import WhatsAppKit
 
 @main
@@ -20,7 +21,7 @@ struct RegainHubApp: App {
         .windowStyle(.hiddenTitleBar)
         .commands {
             CommandGroup(replacing: .newItem) {
-                Button(hub.current == .home || hub.current == .explorer ? "Open Export in Explorer…" : "Open \(hub.current.name) Export…") { openExport() }
+                Button(hub.current == .home || hub.current == .explorer ? "Open Export in Explorer…" : hub.current == .taxes ? "Import Tax Documents…" : "Open \(hub.current.name) Export…") { openExport() }
                     .keyboardShortcut("o")
                 Button("Open Any Export in Explorer…") { hub.chooseExplorerFolder() }
                     .keyboardShortcut("o", modifiers: [.command, .shift])
@@ -37,6 +38,7 @@ struct RegainHubApp: App {
                 case .instagram: InstagramModule.menuItems()
                 case .whatsapp: WhatsAppModule.menuItems()
                 case .amazon: AmazonModule.menuItems()
+                case .taxes: TaxesModule.menuItems()
                 case .home, .explorer: Text("Nothing for this view")
                 }
             }
@@ -62,6 +64,7 @@ struct RegainHubApp: App {
         case .instagram: InstagramModule.chooseFolder()
         case .whatsapp: WhatsAppModule.chooseFolder()
         case .amazon: AmazonModule.chooseFolder()
+        case .taxes: TaxesModule.chooseFolder()
         case .home, .explorer: hub.chooseExplorerFolder()
         }
     }
@@ -93,6 +96,7 @@ struct HubRoot: View {
                 case .instagram: InstagramModule.makeView()
                 case .whatsapp: WhatsAppModule.makeView()
                 case .amazon: AmazonModule.makeView()
+                case .taxes: TaxesModule.makeView()
                 case .explorer: ExplorerView()
                 }
             }

@@ -4,7 +4,7 @@ import RegainCore
 
 /// Everything the hub can show. Each app keeps its own look; the hub only switches between them.
 enum Source: String, CaseIterable, Identifiable {
-    case home, photos, snapchat, instagram, whatsapp, amazon, explorer
+    case home, photos, snapchat, instagram, whatsapp, amazon, taxes, explorer
 
     var id: String { rawValue }
 
@@ -16,6 +16,7 @@ enum Source: String, CaseIterable, Identifiable {
         case .instagram: return "Instagram"
         case .whatsapp: return "WhatsApp"
         case .amazon: return "Amazon"
+        case .taxes: return "Taxes"
         case .explorer: return "Explorer"
         }
     }
@@ -24,6 +25,7 @@ enum Source: String, CaseIterable, Identifiable {
     var appName: String {
         switch self {
         case .home, .explorer: return name
+        case .taxes: return "Tax Desk"
         default: return name + " Clone"
         }
     }
@@ -36,6 +38,7 @@ enum Source: String, CaseIterable, Identifiable {
         case .instagram: return "Instagram's HTML download: your direct messages with photos, videos, reactions and voice notes."
         case .whatsapp: return "WhatsApp's “Export Chat” zips, with photos, stickers, voice notes and documents."
         case .amazon: return "Amazon's “Request Your Data”: orders, spending, Prime Video history and every other file they sent."
+        case .taxes: return "Import slips, receipts and past returns (PDFs, photos or iPhone scans), read them on this Mac, add them up and fill the CRA forms or a UsTaxes file: a draft for your tax preparer."
         case .explorer: return "Any other export — Google, Facebook, TikTok, Spotify… Browse its CSV, JSON and HTML files, and search inside all of them."
         }
     }
@@ -48,6 +51,7 @@ enum Source: String, CaseIterable, Identifiable {
         case .instagram: return "InstagramIcon"
         case .whatsapp: return "WhatsAppIcon"
         case .amazon: return "AmazonIcon"
+        case .taxes: return "TaxesIcon"
         default: return nil
         }
     }
@@ -60,6 +64,7 @@ enum Source: String, CaseIterable, Identifiable {
         case .instagram: return "camera"
         case .whatsapp: return "phone.bubble"
         case .amazon: return "shippingbox"
+        case .taxes: return "doc.text.magnifyingglass"
         case .explorer: return "doc.text.magnifyingglass"
         }
     }
@@ -73,13 +78,14 @@ enum Source: String, CaseIterable, Identifiable {
         case .instagram: (suite, key) = ("com.regainyourdata.shared.instagram", "root")
         case .whatsapp: (suite, key) = ("com.regainyourdata.shared.whatsapp", "root")
         case .amazon: (suite, key) = ("com.regainyourdata.shared.amazon", "root")
+        case .taxes: return nil
         case .explorer: return Hub.shared.explorerRoot?.path
         case .home: return nil
         }
         return UserDefaults(suiteName: suite)?.string(forKey: key)
     }
 
-    static let apps: [Source] = [.photos, .snapchat, .instagram, .whatsapp, .amazon]
+    static let apps: [Source] = [.photos, .snapchat, .instagram, .whatsapp, .amazon, .taxes]
 }
 
 /// Companies whose exports don't have their own view yet. Explorer opens them meanwhile.

@@ -12,6 +12,7 @@ let package = Package(
         .package(path: "../InstagramClone"),
         .package(path: "../WhatsAppClone"),
         .package(path: "../AmazonClone"),
+        .package(path: "../TaxDesk"),
         .package(path: "../../packages/RegainCore"),
     ],
     targets: [
@@ -23,6 +24,7 @@ let package = Package(
                 .product(name: "InstagramKit", package: "InstagramClone"),
                 .product(name: "WhatsAppKit", package: "WhatsAppClone"),
                 .product(name: "AmazonKit", package: "AmazonClone"),
+                .product(name: "TaxKit", package: "TaxDesk"),
                 .product(name: "RegainCore", package: "RegainCore"),
             ],
             path: "Sources/RegainHub"

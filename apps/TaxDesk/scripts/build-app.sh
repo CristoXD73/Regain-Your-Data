@@ -1,6 +1,5 @@
 #!/bin/bash
-# Builds "Regain Your Data.app" (the hub holding every app) into ./dist.noindex and, with
-# --install, copies it to /Applications.
+# Builds "Tax Desk.app" into ./dist.noindex and (with --install) copies it to /Applications.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -11,24 +10,20 @@ if [ -z "${SDKROOT:-}" ] && ! xcode-select -p | grep -q Xcode.app; then
 fi
 
 swift build -c release --arch arm64 --arch x86_64   # universal: Intel and Apple silicon
-BIN="$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/RegainHub"
+BIN="$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/TaxDesk"
 
-NAME="Regain Your Data"
-APP="dist.noindex/$NAME.app"
+APP="dist.noindex/Tax Desk.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN" "$APP/Contents/MacOS/RegainHub"
+cp "$BIN" "$APP/Contents/MacOS/TaxDesk"
 
+# Icon. Resources/AppIcon.icon is the layered Icon Composer source (regenerate it with
+# `swift scripts/make-icon.swift icon Resources`). With Xcode's actool it compiles into Assets.car,
+# which gives the Liquid Glass behaviour of Apple's own icons: light, dark, clear and tinted.
+# Without Xcode only the flat .icns is used, which looks the same in every mode.
 TMP="$(mktemp -d)"
-# The hub's own icon (see scripts/make-icon.swift), and each app's, for the switcher on the left.
 swift scripts/make-icon.swift iconset "$TMP"
 iconutil -c icns "$TMP/AppIcon.iconset" -o "$APP/Contents/Resources/AppIcon.icns"
-for pair in PhotosClone:PhotosIcon SnapchatClone:SnapchatIcon InstagramClone:InstagramIcon WhatsAppClone:WhatsAppIcon AmazonClone:AmazonIcon TaxDesk:TaxesIcon; do
-  dir="${pair%%:*}"; icon="${pair##*:}"
-  mkdir -p "$TMP/$dir"
-  swift "../$dir/scripts/make-icon.swift" iconset "$TMP/$dir"
-  iconutil -c icns "$TMP/$dir/AppIcon.iconset" -o "$APP/Contents/Resources/$icon.icns"
-done
 ICON_NAME_KEY=""
 if ACTOOL="$(xcrun --find actool 2>/dev/null)"; then
   "$ACTOOL" Resources/AppIcon.icon --compile "$APP/Contents/Resources" \
@@ -47,20 +42,20 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>CFBundleName</key><string>$NAME</string>
-  <key>CFBundleDisplayName</key><string>$NAME</string>
-  <key>CFBundleIdentifier</key><string>com.regainyourdata.hub</string>
-  <key>CFBundleExecutable</key><string>RegainHub</string>
+  <key>CFBundleName</key><string>Tax Desk</string>
+  <key>CFBundleDisplayName</key><string>Tax Desk</string>
+  <key>CFBundleIdentifier</key><string>com.regainyourdata.TaxDesk</string>
+  <key>CFBundleExecutable</key><string>TaxDesk</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   ${ICON_NAME_KEY}
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>1.1</string>
+  <key>CFBundleShortVersionString</key><string>1.0</string>
   <key>CFBundleVersion</key><string>${VERSION}</string>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
-  <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
+  <key>LSApplicationCategoryType</key><string>public.app-category.finance</string>
   <key>NSPrincipalClass</key><string>NSApplication</string>
   <key>NSHighResolutionCapable</key><true/>
-  <key>NSRemovableVolumesUsageDescription</key><string>Regain Your Data reads your exports from external drives.</string>
+  <key>NSRemovableVolumesUsageDescription</key><string>Tax Desk reads tax documents you import from external drives.</string>
 </dict>
 </plist>
 PLIST
@@ -70,14 +65,15 @@ codesign --force --deep --options runtime --sign "${SIGN_IDENTITY:--}" "$APP"
 echo "Built $APP"
 
 if [ "${1:-}" = "--install" ]; then
-  pkill -x RegainHub || true
-  rm -rf ~/Applications/"$NAME.app"
+  pkill -x TaxDesk || true
+  # Keep a single copy, in /Applications.
+  rm -rf ~/Applications/"Tax Desk.app"
   DEST=/Applications
   [ -w "$DEST" ] || DEST=~/Applications
   mkdir -p "$DEST"
-  rm -rf "$DEST/$NAME.app"
+  rm -rf "$DEST/Tax Desk.app"
   cp -R "$APP" "$DEST/"
-  /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$DEST/$NAME.app"
-  open "$DEST/$NAME.app"
-  echo "Installed and started $DEST/$NAME.app"
+  /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$DEST/Tax Desk.app"
+  open "$DEST/Tax Desk.app"
+  echo "Installed and started $DEST/Tax Desk.app"
 fi
